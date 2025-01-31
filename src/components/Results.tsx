@@ -38,7 +38,7 @@ class Results extends React.Component<ResultsProps, ResultsState> {
     return (
       <div className="results-section">
         {loading ? (
-          <div className="spinner">Loading...</div>
+          <div className="spinner" />
         ) : error ? (
           <div className="error-message">{error}</div>
         ) : (
