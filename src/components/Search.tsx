@@ -17,6 +17,12 @@ class Search extends React.Component<SearchProps, SearchState> {
     };
   }
 
+  componentDidUpdate(prevProps: SearchProps) {
+    if (prevProps.initialTerm !== this.props.initialTerm) {
+      this.setState({ inputValue: this.props.initialTerm });
+    }
+  }
+
   handleFormSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
     this.handleSearchClick();
