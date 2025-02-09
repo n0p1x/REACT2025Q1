@@ -1,52 +1,17 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import Search from './components/Search';
 import Results from './components/Results';
-import { Person } from './lib/types';
-import useStickyState from './hooks/useStickyState';
+import useSearchState from './hooks/useSearchState';
+import useFetchPeople from './hooks/useFetchPeople';
 
 const App = () => {
-  const [searchTerm, setSearchTerm] = useStickyState('', 'searchTerm');
-  const [items, setItems] = useState<Person[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useSearchState('searchTerm');
+  const { items, loading, error } = useFetchPeople(searchTerm);
   const [hasError, setHasError] = useState(false);
-
-  const fetchData = useCallback(
-    (term?: string) => {
-      const effectiveTerm = term !== undefined ? term : searchTerm;
-      const processedTerm = effectiveTerm.trim();
-      const url = `https://swapi.dev/api/people/?search=${processedTerm}`;
-
-      setLoading(true);
-      setError(null);
-
-      fetch(url)
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          return response.json();
-        })
-        .then((data) => {
-          setItems(data.results);
-          setLoading(false);
-        })
-        .catch((error) => {
-          setError(error.message);
-          setLoading(false);
-        });
-    },
-    [searchTerm]
-  );
-
-  useEffect(() => {
-    fetchData(searchTerm);
-  }, [fetchData, searchTerm]);
 
   const handleSearch = (newTerm: string): void => {
     const processedTerm = newTerm.trim();
     setSearchTerm(processedTerm);
-    fetchData(processedTerm);
   };
 
   const triggerError = (): void => {

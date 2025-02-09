@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
 
-function useStickyState(defaultValue: string, key: string) {
-  const [value, setValue] = useState(() => {
+function useSearchState(
+  key: string,
+  defaultValue = ''
+): [string, React.Dispatch<React.SetStateAction<string>>] {
+  const [value, setValue] = useState<string>(() => {
     const stickyValue = localStorage.getItem(key);
     return stickyValue !== null ? JSON.parse(stickyValue) : defaultValue;
   });
@@ -13,4 +16,4 @@ function useStickyState(defaultValue: string, key: string) {
   return [value, setValue];
 }
 
-export default useStickyState;
+export default useSearchState;
