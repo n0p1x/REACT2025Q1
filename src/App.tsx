@@ -2,9 +2,10 @@ import { useState, useEffect, useCallback } from 'react';
 import Search from './components/Search';
 import Results from './components/Results';
 import { Person } from './lib/types';
+import useStickyState from './hooks/useStickyState';
 
 const App = () => {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useStickyState('', 'searchTerm');
   const [items, setItems] = useState<Person[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -39,14 +40,11 @@ const App = () => {
   );
 
   useEffect(() => {
-    const savedSearchTerm = localStorage.getItem('searchTerm') || '';
-    setSearchTerm(savedSearchTerm);
-    fetchData(savedSearchTerm);
-  }, [fetchData]);
+    fetchData(searchTerm);
+  }, [fetchData, searchTerm]);
 
   const handleSearch = (newTerm: string): void => {
     const processedTerm = newTerm.trim();
-    localStorage.setItem('searchTerm', processedTerm);
     setSearchTerm(processedTerm);
     fetchData(processedTerm);
   };
