@@ -15,7 +15,7 @@ class CardList extends React.Component<CardListProps> {
     const { items } = this.props;
 
     return (
-      <div className="card-list">
+      <div className="flex flex-col gap-4">
         {items.map((item) => (
           <Card
             key={item.name}

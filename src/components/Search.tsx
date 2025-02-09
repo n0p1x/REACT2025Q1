@@ -39,14 +39,23 @@ class Search extends React.Component<SearchProps, SearchState> {
 
   render() {
     return (
-      <form className="search-section" onSubmit={this.handleFormSubmit}>
+      <form
+        className="mb-8 flex flex-col items-stretch gap-2 sm:flex-row"
+        onSubmit={this.handleFormSubmit}
+      >
         <input
           type="text"
           value={this.state.inputValue}
           onChange={this.handleInputChange}
           placeholder="Search..."
+          className="flex-1 rounded border border-gray-300 p-2"
         />
-        <button type="submit">Search</button>
+        <button
+          type="submit"
+          className="rounded border border-blue-600 px-4 py-2 text-blue-600 transition hover:bg-blue-600 hover:text-white"
+        >
+          Search
+        </button>
       </form>
     );
   }

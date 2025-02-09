@@ -73,7 +73,7 @@ class App extends React.Component<object, AppState> {
     const { items, loading, error } = this.state;
 
     return (
-      <div className="app">
+      <div className="relative mx-auto min-h-screen max-w-screen-lg border border-gray-300 bg-[#f4f3ee] p-8 pb-24">
         <Search
           initialTerm={this.state.searchTerm}
           onSearch={this.handleSearch}
