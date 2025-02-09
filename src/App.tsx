@@ -1,87 +1,76 @@
-import React from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Search from './components/Search';
 import Results from './components/Results';
+import { Person } from './lib/types';
 
-interface Person {
-  name: string;
-  birth_year: string;
-}
+const App = () => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [items, setItems] = useState<Person[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [hasError, setHasError] = useState(false);
 
-interface AppState {
-  searchTerm: string;
-  items: Person[];
-  loading: boolean;
-  error: string | null;
-}
+  const fetchData = useCallback(
+    (term?: string) => {
+      const effectiveTerm = term !== undefined ? term : searchTerm;
+      const processedTerm = effectiveTerm.trim();
+      const url = `https://swapi.dev/api/people/?search=${processedTerm}`;
 
-class App extends React.Component<object, AppState> {
-  constructor(props: object) {
-    super(props);
-    this.state = {
-      searchTerm: '',
-      items: [],
-      loading: false,
-      error: null,
-    };
-  }
+      setLoading(true);
+      setError(null);
 
-  componentDidMount(): void {
+      fetch(url)
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then((data) => {
+          setItems(data.results);
+          setLoading(false);
+        })
+        .catch((error) => {
+          setError(error.message);
+          setLoading(false);
+        });
+    },
+    [searchTerm]
+  );
+
+  useEffect(() => {
     const savedSearchTerm = localStorage.getItem('searchTerm') || '';
-    this.setState({ searchTerm: savedSearchTerm }, () => {
-      this.fetchData();
-    });
-  }
+    setSearchTerm(savedSearchTerm);
+    fetchData(savedSearchTerm);
+  }, [fetchData]);
 
-  fetchData = (): void => {
-    const { searchTerm } = this.state;
-    const processedTerm = searchTerm.trim();
-    const url = `https://swapi.dev/api/people/?search=${processedTerm}`;
-
-    this.setState({ loading: true, error: null });
-
-    fetch(url)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then((data) => {
-        this.setState({
-          items: data.results,
-          loading: false,
-          error: null,
-        });
-      })
-      .catch((error) => {
-        this.setState({
-          error: error.message,
-          loading: false,
-        });
-      });
-  };
-
-  handleSearch = (newTerm: string): void => {
+  const handleSearch = (newTerm: string): void => {
     const processedTerm = newTerm.trim();
     localStorage.setItem('searchTerm', processedTerm);
-    this.setState({ searchTerm: processedTerm }, () => {
-      this.fetchData();
-    });
+    setSearchTerm(processedTerm);
+    fetchData(processedTerm);
   };
 
-  render() {
-    const { items, loading, error } = this.state;
+  const triggerError = (): void => {
+    setHasError(true);
+  };
 
-    return (
-      <div className="relative mx-auto min-h-screen max-w-screen-lg border border-gray-300 bg-[#f4f3ee] p-8 pb-24">
-        <Search
-          initialTerm={this.state.searchTerm}
-          onSearch={this.handleSearch}
-        />
-        <Results items={items} loading={loading} error={error} />
-      </div>
-    );
+  if (hasError) {
+    throw new Error('Test error');
   }
-}
+
+  return (
+    <div className="relative mx-auto min-h-screen max-w-screen-lg border border-gray-300 bg-[#f4f3ee] p-8 pb-24">
+      <Search initialTerm={searchTerm} onSearch={handleSearch} />
+      <Results items={items} loading={loading} error={error} />
+      <button
+        onClick={triggerError}
+        className="absolute right-8 bottom-8 rounded border border-red-600 px-4 py-2 text-red-600 transition hover:bg-red-600 hover:text-white"
+      >
+        Throw Error
+      </button>
+    </div>
+  );
+};
 
 export default App;

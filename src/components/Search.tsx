@@ -1,64 +1,47 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface SearchProps {
   initialTerm: string;
   onSearch: (term: string) => void;
 }
 
-interface SearchState {
-  inputValue: string;
-}
+const Search: React.FC<SearchProps> = ({ initialTerm, onSearch }) => {
+  const [inputValue, setInputValue] = useState(initialTerm);
 
-class Search extends React.Component<SearchProps, SearchState> {
-  constructor(props: SearchProps) {
-    super(props);
-    this.state = {
-      inputValue: props.initialTerm,
-    };
-  }
+  useEffect(() => {
+    setInputValue(initialTerm);
+  }, [initialTerm]);
 
-  componentDidUpdate(prevProps: SearchProps) {
-    if (prevProps.initialTerm !== this.props.initialTerm) {
-      this.setState({ inputValue: this.props.initialTerm });
-    }
-  }
-
-  handleFormSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
-    this.handleSearchClick();
+    const processedTerm = inputValue.trim();
+    onSearch(processedTerm);
   };
 
-  handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    this.setState({ inputValue: e.target.value });
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+    setInputValue(e.target.value);
   };
 
-  handleSearchClick = (): void => {
-    const processedTerm = this.state.inputValue.trim();
-    this.props.onSearch(processedTerm);
-  };
-
-  render() {
-    return (
-      <form
-        className="mb-8 flex flex-col items-stretch gap-2 sm:flex-row"
-        onSubmit={this.handleFormSubmit}
+  return (
+    <form
+      className="mb-8 flex flex-col items-stretch gap-2 sm:flex-row"
+      onSubmit={handleFormSubmit}
+    >
+      <input
+        type="text"
+        value={inputValue}
+        onChange={handleInputChange}
+        placeholder="Search..."
+        className="flex-1 rounded border border-gray-300 p-2"
+      />
+      <button
+        type="submit"
+        className="rounded border border-blue-600 px-4 py-2 text-blue-600 transition hover:bg-blue-600 hover:text-white"
       >
-        <input
-          type="text"
-          value={this.state.inputValue}
-          onChange={this.handleInputChange}
-          placeholder="Search..."
-          className="flex-1 rounded border border-gray-300 p-2"
-        />
-        <button
-          type="submit"
-          className="rounded border border-blue-600 px-4 py-2 text-blue-600 transition hover:bg-blue-600 hover:text-white"
-        >
-          Search
-        </button>
-      </form>
-    );
-  }
-}
+        Search
+      </button>
+    </form>
+  );
+};
 
 export default Search;
