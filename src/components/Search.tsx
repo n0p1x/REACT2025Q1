@@ -32,7 +32,7 @@ const Search: React.FC<SearchProps> = ({ initialTerm, onSearch }) => {
         value={inputValue}
         onChange={handleInputChange}
         placeholder="Search..."
-        className="flex-1 rounded border border-gray-300 p-2"
+        className="flex-1 rounded border border-gray-300 bg-white p-2"
       />
       <button
         type="submit"
