@@ -12,7 +12,7 @@ function useFetchPeople(searchTerm: string, page: number = 1) {
   const [items, setItems] = useState<Person[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [totalPages, setTotalPages] = useState<number>(1);
+  const [totalPages, setTotalPages] = useState<number>();
 
   const fetchData = useCallback(
     async (term?: string) => {

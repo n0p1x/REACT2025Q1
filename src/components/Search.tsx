@@ -24,7 +24,7 @@ const Search: React.FC<SearchProps> = ({ initialTerm, onSearch }) => {
 
   return (
     <form
-      className="mb-8 flex flex-col items-stretch gap-2 sm:flex-row"
+      className="flex grow flex-row items-stretch gap-1 rounded border border-indigo-500 bg-indigo-50 p-1"
       onSubmit={handleFormSubmit}
     >
       <input
@@ -36,7 +36,7 @@ const Search: React.FC<SearchProps> = ({ initialTerm, onSearch }) => {
       />
       <button
         type="submit"
-        className="rounded border border-blue-600 px-4 py-2 text-blue-600 transition hover:bg-blue-600 hover:text-white"
+        className="cursor-pointer rounded border border-blue-600 px-4 py-2 text-blue-600 transition hover:bg-blue-600 hover:text-white"
       >
         Search
       </button>
