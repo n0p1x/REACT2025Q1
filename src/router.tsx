@@ -1,7 +1,8 @@
 import { Route, Routes } from 'react-router';
-import NotFound from './components/NotFound';
+
 import App from './components/App';
 import Details from './components/Details';
+import NotFound from './components/NotFound';
 
 function Router() {
   return (

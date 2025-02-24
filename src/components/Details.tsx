@@ -1,23 +1,21 @@
 import React from 'react';
-import { useNavigate, useParams } from 'react-router';
+import { useNavigate, useParams, useSearchParams } from 'react-router';
+
+import { useGetPersonQuery } from '../store/api/swapi';
 import Spinner from './Spinner';
-import useFetchPerson from '../hooks/useFetchPerson';
 
 const Details: React.FC = () => {
   const navigate = useNavigate();
-  const { personId } = useParams<{ personId: string }>();
-  const { person, loading, error } = useFetchPerson(personId);
+  const [searchParams] = useSearchParams();
+  const { personId = '' } = useParams<{ personId: string }>();
+  const { data, isLoading, isFetching } = useGetPersonQuery(personId);
 
   const handleClose = () => {
-    navigate({ pathname: '/' });
+    navigate({ pathname: '/', search: searchParams.toString() });
   };
 
-  if (!person) {
-    return null;
-  }
-
   return (
-    <div className="relative border border-blue-500 bg-blue-50 p-1">
+    <div className="relative border border-blue-500 bg-blue-50 p-1 [.dark_&]:bg-blue-900">
       <button
         onClick={handleClose}
         className="absolute top-1 right-1 grid size-5 cursor-pointer content-center p-1 text-gray-500 hover:text-gray-700"
@@ -25,37 +23,37 @@ const Details: React.FC = () => {
         ✕
       </button>
 
-      {loading ? (
+      {isLoading ? (
         <Spinner fullScreen />
-      ) : error ? (
-        <div className="p-8 text-center text-red-600">{error}</div>
-      ) : (
+      ) : data ? (
         <div>
-          <h2 className="mb-4 text-2xl font-bold">{person.name}</h2>
-          <dl className="[&_dd]:inline [&_dd]:text-gray-500 [&_dt]:font-semibold [&_dt]:text-gray-900">
+          <h2 className="mb-4 text-2xl font-bold">
+            {data.name} {isFetching && '🔍'}
+          </h2>
+          <dl className="grid grid-cols-[auto_1fr] gap-x-3 [&_dd]:text-gray-500 [&_dt]:font-semibold [&_dt]:text-gray-900 [.dark_&]:[&_dd]:text-gray-400 [.dark_&]:[&_dt]:text-gray-100">
             <dt>Gender:</dt>
-            <dd>{person.gender}</dd>
+            <dd>{data.gender}</dd>
 
             <dt>Birth Year:</dt>
-            <dd>{person.birth_year}</dd>
+            <dd>{data.birth_year}</dd>
 
             <dt>Height:</dt>
-            <dd>{person.height}cm</dd>
+            <dd>{data.height}cm</dd>
 
             <dt>Mass:</dt>
-            <dd>{person.mass}kg</dd>
+            <dd>{data.mass}kg</dd>
 
             <dt>Hair Color:</dt>
-            <dd>{person.hair_color}</dd>
+            <dd>{data.hair_color}</dd>
 
             <dt>Eye Color:</dt>
-            <dd>{person.eye_color}</dd>
+            <dd>{data.eye_color}</dd>
 
             <dt>Skin Color:</dt>
-            <dd>{person.skin_color}</dd>
+            <dd>{data.skin_color}</dd>
           </dl>
         </div>
-      )}
+      ) : null}
     </div>
   );
 };

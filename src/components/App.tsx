@@ -1,20 +1,27 @@
 import { useState } from 'react';
-import Search from './Search';
-import useSearchState from '../hooks/useSearchState';
-import useFetchPeople from '../hooks/useFetchPeople';
 import { Outlet, useSearchParams } from 'react-router';
-import Pagination from './Pagination';
+
+import { useTheme } from '../contexts/ThemeContext';
+import useSearchState from '../hooks/useSearchState';
+import { cn } from '../lib/utils';
+import { useGetPeopleQuery } from '../store/api/swapi';
 import CardList from './CardList';
+import Pagination from './Pagination';
+import Search from './Search';
+import SelectionFlyout from './SelectionFlyout';
+import ThemeSelector from './ThemeSelector';
 
 const App = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const currentPage = Number(searchParams.get('page')) || 1;
   const [searchTerm, setSearchTerm] = useSearchState('searchTerm');
-  const { items, loading, error, totalPages } = useFetchPeople(
-    searchTerm,
-    currentPage
-  );
   const [hasError, setHasError] = useState(false);
+  const { theme } = useTheme();
+
+  const { data, isLoading, isFetching } = useGetPeopleQuery({
+    search: searchTerm,
+    page: currentPage,
+  });
 
   const handleSearch = (newTerm: string): void => {
     const processedTerm = newTerm.trim();
@@ -31,32 +38,40 @@ const App = () => {
   }
 
   return (
-    <div className="mx-auto h-svh max-w-screen-lg border border-teal-500 bg-teal-50 p-1">
-      <div className="flex flex-row items-stretch gap-1 border border-cyan-500 bg-cyan-50 p-1">
-        <button className="cursor-pointer rounded border border-pink-600 px-4 py-2 text-pink-600 transition hover:bg-pink-600 hover:text-white">
-          Reset
-        </button>
-        <Search initialTerm={searchTerm} onSearch={handleSearch} />
-      </div>
-
-      <div className="mt-1 grid h-10/12 auto-cols-fr grid-flow-col gap-1">
-        <CardList items={items} loading={loading} error={error} />
-
-        <Outlet />
-      </div>
-
-      {totalPages && (
-        <div className="mx-auto mt-1 w-min">
-          <Pagination currentPage={currentPage} totalPages={totalPages} />
-        </div>
+    <div
+      className={cn(
+        `relative min-h-svh`,
+        theme === 'dark' ? 'dark bg-gray-900 text-white' : 'bg-gray-50'
       )}
+    >
+      <div className="mx-auto max-w-screen-lg pb-16">
+        <div className="flex items-center justify-between py-4">
+          <button
+            onClick={triggerError}
+            className="cursor-pointer rounded border border-red-600 bg-white px-2 py-1 text-red-600 transition hover:bg-red-600 hover:text-white [.dark_&]:border-red-400 [.dark_&]:bg-gray-900 [.dark_&]:text-red-400 [.dark_&]:hover:bg-red-600 [.dark_&]:hover:text-white"
+          >
+            Throw Error
+          </button>
+          <ThemeSelector />
+        </div>
 
-      <button
-        onClick={triggerError}
-        className="absolute right-1 bottom-1 cursor-pointer rounded border border-red-600 bg-white px-4 py-2 text-red-600 transition hover:bg-red-600 hover:text-white"
-      >
-        Throw Error
-      </button>
+        <Search initialTerm={searchTerm} onSearch={handleSearch} />
+
+        <div className="mt-1 grid h-10/12 auto-cols-fr grid-flow-col gap-1">
+          {data && <CardList items={data.results} loading={isLoading} />}
+          <Outlet />
+        </div>
+
+        {data && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={data.count / 10}
+            disabled={isFetching}
+          />
+        )}
+      </div>
+
+      <SelectionFlyout />
     </div>
   );
 };

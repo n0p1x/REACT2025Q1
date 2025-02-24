@@ -1,26 +1,28 @@
 import React from 'react';
-import Card from './Card';
+
 import { Person } from '../lib/types';
+import Card from './Card';
 import Spinner from './Spinner';
 
 interface CardListProps {
   items: Person[];
   loading: boolean;
-  error: string | null;
 }
 
-const CardList: React.FC<CardListProps> = ({ items, loading, error }) => {
+const CardList: React.FC<CardListProps> = ({ items, loading }) => {
   return (
-    <div className="rounded border border-yellow-500 bg-yellow-50">
+    <div className="border border-yellow-500 bg-yellow-50 [.dark_&]:bg-yellow-900">
       {loading ? (
         <Spinner fullScreen />
-      ) : error ? (
-        <div className="p-8 text-center text-red-600">{error}</div>
-      ) : (
+      ) : items.length > 0 ? (
         <div className="flex flex-col gap-1 p-1">
           {items.map((item) => (
-            <Card key={item.url} name={item.name} url={item.url} />
+            <Card key={item.url} person={item} />
           ))}
+        </div>
+      ) : (
+        <div className="flex flex-col gap-1 p-1">
+          <p>No items found</p>
         </div>
       )}
     </div>
