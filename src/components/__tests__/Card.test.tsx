@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 
 import { mockPerson } from '../../__tests__/utils';
 import { renderWithProviders } from '../../__tests__/utils';
+import { swapiApi } from '../../store/api/swapi';
 import selectedItemsReducer from '../../store/slices/selectedItems';
 import Card from '../Card';
 
@@ -31,10 +32,15 @@ describe('Card', () => {
     const store = configureStore({
       reducer: {
         selectedItems: selectedItemsReducer,
+        [swapiApi.reducerPath]: swapiApi.reducer,
       },
+      middleware: (getDefaultMiddleware) =>
+        getDefaultMiddleware().concat(swapiApi.middleware),
       preloadedState: {
         selectedItems: {
-          items: { '1': mockPerson },
+          items: {
+            '1': mockPerson,
+          },
         },
       },
     });
