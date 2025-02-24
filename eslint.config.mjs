@@ -1,11 +1,12 @@
 import js from '@eslint/js';
-import globals from 'globals';
+import perfectionist from 'eslint-plugin-perfectionist';
+import eslintPluginPrettier from 'eslint-plugin-prettier/recommended';
+import react from 'eslint-plugin-react';
+import reactCompiler from 'eslint-plugin-react-compiler';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
-import react from 'eslint-plugin-react';
+import globals from 'globals';
 import tseslint from 'typescript-eslint';
-import eslintPluginPrettier from 'eslint-plugin-prettier/recommended';
-import reactCompiler from 'eslint-plugin-react-compiler';
 
 export default tseslint.config(
   { ignores: ['dist'] },
@@ -40,6 +41,33 @@ export default tseslint.config(
       react: {
         version: 'detect',
       },
+    },
+  },
+  {
+    plugins: {
+      perfectionist,
+    },
+    rules: {
+      'perfectionist/sort-imports': [
+        'error',
+        {
+          internalPattern: ['^@/.+'],
+          groups: [
+            ['type'],
+            ['builtin', 'external'],
+            ['internal', 'parent', 'sibling', 'index'],
+            'unknown',
+            ['side-effect', 'side-effect-style'],
+          ],
+        },
+      ],
+      'perfectionist/sort-named-imports': [
+        'error',
+        {
+          groupKind: 'types-first',
+        },
+      ],
+      'perfectionist/sort-named-exports': ['error'],
     },
   }
 );
