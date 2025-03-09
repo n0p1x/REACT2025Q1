@@ -1,3 +1,4 @@
+import { FlatCompat } from "@eslint/eslintrc";
 import js from '@eslint/js';
 import perfectionist from 'eslint-plugin-perfectionist';
 import eslintPluginPrettier from 'eslint-plugin-prettier/recommended';
@@ -6,9 +7,19 @@ import reactCompiler from 'eslint-plugin-react-compiler';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import globals from 'globals';
+import { dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 import tseslint from 'typescript-eslint';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const compat = new FlatCompat({
+  baseDirectory: __dirname,
+});
+
 export default tseslint.config(
+	...compat.extends("next/core-web-vitals", "next/typescript"),
   { ignores: ['dist'] },
   {
     extends: [

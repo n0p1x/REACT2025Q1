@@ -3,5 +3,8 @@
  * @type {import('lint-staged').Configuration}
  */
 export default {
-  '*': 'npm run lint',
+	'src/**/*.ts?(x)': [
+    'eslint --fix',
+    'prettier --write',
+	],
 };

@@ -22,10 +22,15 @@ describe('Card', () => {
     expect(checkbox).toBeChecked();
   });
 
-  it('renders link to details', () => {
-    renderWithProviders(<Card person={mockPerson} />);
+  it('renders link to details with query params', () => {
+    renderWithProviders(<Card person={mockPerson} />, {
+      router: {
+        query: { page: '2' },
+        isReady: true,
+      },
+    });
     const link = screen.getByText('View Details');
-    expect(link).toHaveAttribute('href', '/1/');
+    expect(link).toHaveAttribute('href', '/1?page=2');
   });
 
   it('maintains selection state from redux store', () => {

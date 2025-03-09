@@ -1,5 +1,6 @@
+import Link from 'next/link';
+import { useRouter } from 'next/router';
 import React from 'react';
-import { Link, useSearchParams } from 'react-router';
 
 import { Person } from '../lib/types';
 import { cn } from '../lib/utils';
@@ -10,12 +11,19 @@ interface CardProps {
   person: Person;
 }
 
+const extractIdFromUrl = (url: string) => {
+  const matches = url.match(/\/(\d+)\/$/);
+  return matches ? matches[1] : '1';
+};
+
 const Card: React.FC<CardProps> = ({ person }) => {
   const dispatch = useAppDispatch();
-  const [search] = useSearchParams();
+  const router = useRouter();
   const selectedItems = useAppSelector((state) => state.selectedItems.items);
   const id = person.url.split('/').filter(Boolean).pop() || '';
   const isSelected = Boolean(selectedItems[id]);
+  const currentPage = router.query.page || '1';
+  const personId = extractIdFromUrl(person.url);
 
   return (
     <div
@@ -33,8 +41,11 @@ const Card: React.FC<CardProps> = ({ person }) => {
       </div>
       <h3 className="text-lg font-semibold">{person.name}</h3>
       <Link
-        to={`/${id}/?${search}`}
-        className="inline-block text-blue-400 hover:text-blue-500 [.dark_&]:text-blue-500 [.dark_&]:hover:text-blue-400"
+        href={{
+          pathname: `/${personId}`,
+          query: { page: currentPage },
+        }}
+        className="text-blue-500 hover:underline"
       >
         View Details
       </Link>

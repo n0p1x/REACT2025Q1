@@ -1,17 +1,22 @@
+import { useRouter } from 'next/router';
 import React from 'react';
-import { useNavigate, useParams, useSearchParams } from 'react-router';
 
-import { useGetPersonQuery } from '../store/api/swapi';
-import Spinner from './Spinner';
+import Spinner from '@/components/Spinner';
+import { useGetPersonQuery } from '@/store/api/swapi';
 
 const Details: React.FC = () => {
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const { personId = '' } = useParams<{ personId: string }>();
-  const { data, isLoading, isFetching } = useGetPersonQuery(personId);
+  const router = useRouter();
+  const { id, page } = router.query;
+  const { data, isLoading, isError } = useGetPersonQuery(id as string);
+
+  if (isLoading) return <Spinner fullScreen />;
+  if (isError) return <div>Error loading character details</div>;
 
   const handleClose = () => {
-    navigate({ pathname: '/', search: searchParams.toString() });
+    router.push({
+      pathname: '/',
+      query: { page },
+    });
   };
 
   return (
@@ -23,13 +28,9 @@ const Details: React.FC = () => {
         ✕
       </button>
 
-      {isLoading ? (
-        <Spinner fullScreen />
-      ) : data ? (
+      {data && (
         <div>
-          <h2 className="mb-4 text-2xl font-bold">
-            {data.name} {isFetching && '🔍'}
-          </h2>
+          <h2 className="mb-4 text-2xl font-bold">{data.name}</h2>
           <dl className="grid grid-cols-[auto_1fr] gap-x-3 [&_dd]:text-gray-500 [&_dt]:font-semibold [&_dt]:text-gray-900 [.dark_&]:[&_dd]:text-gray-400 [.dark_&]:[&_dt]:text-gray-100">
             <dt>Gender:</dt>
             <dd>{data.gender}</dd>
@@ -53,7 +54,7 @@ const Details: React.FC = () => {
             <dd>{data.skin_color}</dd>
           </dl>
         </div>
-      ) : null}
+      )}
     </div>
   );
 };

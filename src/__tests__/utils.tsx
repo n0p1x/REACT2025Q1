@@ -1,25 +1,62 @@
 import { render } from '@testing-library/react';
+import { NextRouter } from 'next/router';
 import { Provider } from 'react-redux';
-import { BrowserRouter } from 'react-router';
+import { vi } from 'vitest';
 
 import { ThemeProvider } from '../contexts/ThemeContext';
 import { store as defaultStore } from '../store';
 
+const mockRouter: NextRouter = {
+  route: '/',
+  pathname: '/',
+  query: {},
+  asPath: '/',
+  basePath: '',
+  isLocaleDomain: false,
+  push: vi.fn(),
+  replace: vi.fn(),
+  reload: vi.fn(),
+  back: vi.fn(),
+  forward: vi.fn(),
+  prefetch: vi.fn(),
+  beforePopState: vi.fn(),
+  events: {
+    on: vi.fn(),
+    off: vi.fn(),
+    emit: vi.fn(),
+  },
+  isFallback: false,
+  isPreview: false,
+  isReady: true,
+};
+
+vi.mock('next/router', () => ({
+  useRouter: () => mockRouter,
+}));
+
 interface RenderOptions {
   store?: typeof defaultStore;
+  router?: Partial<NextRouter>;
 }
 
 export function renderWithProviders(
   ui: React.ReactElement,
-  { store = defaultStore }: RenderOptions = {}
+  { store = defaultStore, router }: RenderOptions = {}
 ) {
-  return render(
+  if (router) {
+    Object.assign(mockRouter, router);
+  }
+
+  const result = render(
     <Provider store={store}>
-      <ThemeProvider>
-        <BrowserRouter>{ui}</BrowserRouter>
-      </ThemeProvider>
+      <ThemeProvider>{ui}</ThemeProvider>
     </Provider>
   );
+
+  return {
+    ...result,
+    router: mockRouter,
+  };
 }
 
 export const mockPerson = {
@@ -40,3 +77,7 @@ export const mockPerson = {
   edited: '2014-12-20T21:17:56.891000Z',
   url: 'https://swapi.dev/api/people/1/',
 };
+
+export function getMockRouter() {
+  return mockRouter;
+}

@@ -15,14 +15,21 @@ describe('Pagination', () => {
   });
 
   it('handles page changes', async () => {
-    renderWithProviders(
-      <Pagination currentPage={1} totalPages={10} disabled={false} />
+    const { router } = renderWithProviders(
+      <Pagination currentPage={1} totalPages={10} disabled={false} />,
+      {
+        router: {
+          query: { page: '1' },
+          isReady: true,
+        },
+      }
     );
 
-    await userEvent.click(screen.getByText('>'));
-
-    const searchParams = new URLSearchParams(window.location.search);
-    expect(searchParams.get('page')).toBe('2');
+    await userEvent.click(screen.getByText('2'));
+    expect(router.push).toHaveBeenCalledWith({
+      pathname: '/',
+      query: { page: '2' },
+    });
   });
 
   it('disables previous button on first page', () => {
@@ -48,5 +55,25 @@ describe('Pagination', () => {
     buttons.forEach((button) => {
       expect(button).toBeDisabled();
     });
+  });
+
+  it('handles invalid page number clicks', async () => {
+    const { router } = renderWithProviders(
+      <Pagination currentPage={15} totalPages={10} disabled={false} />
+    );
+
+    const lastPageButton = screen.getByText('10');
+    await userEvent.click(lastPageButton);
+    expect(router.push).toHaveBeenCalledWith({
+      pathname: '/',
+      query: { page: '10' },
+    });
+  });
+
+  it('handles current page out of bounds', () => {
+    renderWithProviders(
+      <Pagination currentPage={15} totalPages={10} disabled={false} />
+    );
+    expect(screen.getByText('10')).toBeInTheDocument();
   });
 });

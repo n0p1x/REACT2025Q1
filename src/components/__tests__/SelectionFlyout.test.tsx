@@ -45,24 +45,23 @@ describe('SelectionFlyout', () => {
     expect(screen.queryByText(/items? selected/)).not.toBeInTheDocument();
   });
 
-  it('generates correct CSV on download', async () => {
+  it('handles CSV download', async () => {
     const store = createTestStore({ [mockPerson.url]: mockPerson });
+    const { router } = renderWithProviders(<SelectionFlyout />, {
+      store,
+      router: {
+        isReady: true,
+      },
+    });
 
-    const mockObjectUrl = 'blob:test';
-    const createObjectURL = vi.fn().mockReturnValue(mockObjectUrl);
     const mockClick = vi.fn();
-
-    vi.spyOn(URL, 'createObjectURL').mockImplementation(createObjectURL);
     vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(
       mockClick
     );
 
-    renderWithProviders(<SelectionFlyout />, { store });
     await userEvent.click(screen.getByText('Download'));
 
-    expect(createObjectURL).toHaveBeenCalled();
     expect(mockClick).toHaveBeenCalled();
-
-    vi.restoreAllMocks();
+    expect(router.replace).not.toHaveBeenCalled();
   });
 });

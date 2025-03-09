@@ -2,7 +2,7 @@ import { screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
 import { renderWithProviders } from '../../__tests__/utils';
-import NotFound from '../NotFound';
+import NotFound from '@/pages/404';
 
 describe('NotFound', () => {
   it('renders not found message', () => {

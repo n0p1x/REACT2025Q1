@@ -1,5 +1,5 @@
+import { useRouter } from 'next/router';
 import React from 'react';
-import { useSearchParams } from 'react-router';
 
 import { cn } from '../lib/utils';
 
@@ -14,14 +14,15 @@ const Pagination: React.FC<PaginationProps> = ({
   totalPages,
   disabled,
 }) => {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const router = useRouter();
 
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
 
   const handlePageChange = (page: number): void => {
-    const newParams = new URLSearchParams(searchParams);
-    newParams.set('page', page.toString());
-    setSearchParams(newParams);
+    router.push({
+      pathname: router.pathname,
+      query: { ...router.query, page: page.toString() },
+    });
   };
 
   return (
@@ -50,6 +51,18 @@ const Pagination: React.FC<PaginationProps> = ({
           {page}
         </button>
       ))}
+
+      {totalPages > 7 && currentPage > 4 && (
+        <span className="px-3 py-1" aria-hidden="true">
+          ...
+        </span>
+      )}
+
+      {totalPages > 7 && currentPage <= totalPages - 4 && (
+        <span className="px-3 py-1" aria-hidden="true">
+          ...
+        </span>
+      )}
 
       <button
         onClick={() => handlePageChange(currentPage + 1)}

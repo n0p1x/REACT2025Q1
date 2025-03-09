@@ -1,5 +1,5 @@
+import Link from 'next/link';
 import React from 'react';
-import { Link } from 'react-router';
 
 const NotFound: React.FC = () => {
   return (
@@ -10,7 +10,7 @@ const NotFound: React.FC = () => {
         The page you&apos;re looking for doesn&apos;t exist or has been moved.
       </p>
       <Link
-        to="/"
+        href="/"
         className="rounded border border-blue-600 px-6 py-2 text-blue-600 transition hover:bg-blue-600 hover:text-white"
       >
         Go Home

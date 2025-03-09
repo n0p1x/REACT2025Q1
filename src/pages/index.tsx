@@ -1,19 +1,19 @@
+import { useRouter } from 'next/router';
 import { useState } from 'react';
-import { Outlet, useSearchParams } from 'react-router';
 
-import { useTheme } from '../contexts/ThemeContext';
-import useSearchState from '../hooks/useSearchState';
-import { cn } from '../lib/utils';
-import { useGetPeopleQuery } from '../store/api/swapi';
-import CardList from './CardList';
-import Pagination from './Pagination';
-import Search from './Search';
-import SelectionFlyout from './SelectionFlyout';
-import ThemeSelector from './ThemeSelector';
+import CardList from '@/components/CardList';
+import Pagination from '@/components/Pagination';
+import Search from '@/components/Search';
+import SelectionFlyout from '@/components/SelectionFlyout';
+import ThemeSelector from '@/components/ThemeSelector';
+import { useTheme } from '@/contexts/ThemeContext';
+import useSearchState from '@/hooks/useSearchState';
+import { cn } from '@/lib/utils';
+import { useGetPeopleQuery } from '@/store/api/swapi';
 
-const App = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const currentPage = Number(searchParams.get('page')) || 1;
+const HomePage = () => {
+  const router = useRouter();
+  const currentPage = Number(router.query.page) || 1;
   const [searchTerm, setSearchTerm] = useSearchState('searchTerm');
   const [hasError, setHasError] = useState(false);
   const { theme } = useTheme();
@@ -26,7 +26,7 @@ const App = () => {
   const handleSearch = (newTerm: string): void => {
     const processedTerm = newTerm.trim();
     setSearchTerm(processedTerm);
-    setSearchParams({ page: '1' });
+    router.replace({ query: { page: 1 } });
   };
 
   const triggerError = (): void => {
@@ -59,13 +59,14 @@ const App = () => {
 
         <div className="mt-1 grid h-10/12 auto-cols-fr grid-flow-col gap-1">
           {data && <CardList items={data.results} loading={isLoading} />}
-          <Outlet />
+
+          {/* <Outlet /> */}
         </div>
 
         {data && (
           <Pagination
             currentPage={currentPage}
-            totalPages={data.count / 10}
+            totalPages={Math.ceil(data.count / 10)}
             disabled={isFetching}
           />
         )}
@@ -76,4 +77,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default HomePage;
